@@ -1,194 +1,392 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<!doctype html>
+<html lang="en">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>HBD love</title>	    
-    <link type="text/css" rel="stylesheet" href="./file/default.css">
-    <script type="text/javascript" src="./file/jquery.min.js"></script>
-    <script type="text/javascript" src="./file/jscex.min.js"></script>
-    <script type="text/javascript" src="./file/jscex-parser.js"></script>
-    <script type="text/javascript" src="./file/jscex-jit.js"></script>
-    <script type="text/javascript" src="./file/jscex-builderbase.min.js"></script>
-    <script type="text/javascript" src="./file/jscex-async.min.js"></script>
-    <script type="text/javascript" src="./file/jscex-async-powerpack.min.js"></script>
-    <script type="text/javascript" src="./file/functions.js" charset="utf-8"></script>
-    <script type="text/javascript" src="./file/love.js" charset="utf-8"></script>
-    <script>
-        function playAudio() {
-            var audio = document.getElementById("myAudio");
-            audio.play();
-        }
-    </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Coin Dash Arcade</title>
+  <style>
+    :root {
+      --bg: #0f1021;
+      --panel: #1b1d3a;
+      --accent: #ffcc00;
+      --player: #4dd4ff;
+      --enemy: #ff5f6d;
+      --coin: #ffd166;
+      --text: #f8f8ff;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: "Trebuchet MS", Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top, #2a2d58, var(--bg));
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .game-shell {
+      width: min(920px, 95vw);
+      background: var(--panel);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .score {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+    }
+
+    button {
+      background: linear-gradient(135deg, #7f5af0, #5f6dff);
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    canvas {
+      width: 100%;
+      height: 520px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #161834, #101223);
+      display: block;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .message {
+      margin-top: 12px;
+      text-align: center;
+      opacity: 0.8;
+    }
+
+    .legend {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 10px;
+      flex-wrap: wrap;
+      font-size: 0.9rem;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+  </style>
 </head>
 <body>
-    <div id="main">
-        <div id="error"><a href="http://www.google.cn/chrome/intl/zh-CN/landing_chrome.html?hl=zh-CN&brand=CHMI">Chrome</a> (<a href="http://firefox.com.cn/download/">Firefox</a>)</div>
-        <audio autoplay="autoplay" height="100" width="100" id="myAudio">
-            <source src="aud.mp3" type="audio/mp3" />
-            <embed height="100" width="100" src="aud.mp3" />
-        </audio>
-        <div id="wrap">
-            <div id="text">
-                <div id="code">
-                    <<div class="birthday-message">
-  <span class="say">Dear Nani,</span><br><br>
+  <main class="game-shell">
+    <header>
+      <div class="score">Score: <span id="score">0</span></div>
+      <div class="controls">
+        <button id="startBtn">Start Game</button>
+        <button id="restartBtn" disabled>Restart</button>
+      </div>
+    </header>
 
-  <span class="say">Today is your special day, and I want to wish you Happy Birthday with all my heart. 💖</span><br>
-  <span class="say">You are one of the most important people in my life.</span><br>
-  <span class="say">Your love, your duas, and your hugs mean the world to me. 🤗</span><br>
-  <span class="say">Even though I’m still in class 9 and learning about life, I know how blessed I am to have you.</span><br><br>
+    <canvas id="gameCanvas" width="900" height="520" aria-label="Coin Dash Game"></canvas>
 
-  <span class="say">May Allah always protect you, give you good health, and keep a smile on your face. 🌙🍀</span><br>
-  <span class="say">You are not just my Nani, you are my strength and my biggest support.</span><br><br>
+    <div class="message" id="message">Use arrow keys to move. Collect coins, dodge enemies!</div>
 
-  <span class="say">I love you from the bottom of my heart, and I will always try to make you proud. ❤️</span><br>
-  <span class="say">Have the happiest birthday ever, Nani! 🎂🎉</span><br><br>
-
-  <span class="say">With all my love,</span><br>
-  <span class="say">Your grandchild ❤️</span>
-</div>
-
-                </div>
-            </div>
-            <div id="clock-box">
-                <span id="clock">577 days 0 hours 0 minutes 0 seconds</span> <!-- Change to "6940 days..." if needed -->
-            </div>
-            <canvas id="canvas" width="1100" height="680"></canvas>
-        </div>
+    <div class="legend">
+      <span><i class="dot" style="background: var(--player);"></i> Player</span>
+      <span><i class="dot" style="background: var(--coin);"></i> Coin</span>
+      <span><i class="dot" style="background: var(--enemy);"></i> Enemy</span>
     </div>
+  </main>
 
-    <script>
-    (function() {
-        var canvas = $('#canvas');
-		
-        if (!canvas[0].getContext) {
-            $("#error").show();
-            return false;
+  <script>
+    // ====== Canvas Setup ======
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const scoreEl = document.getElementById("score");
+    const startBtn = document.getElementById("startBtn");
+    const restartBtn = document.getElementById("restartBtn");
+    const messageEl = document.getElementById("message");
+
+    // ====== Simple Sound Effects (Web Audio API) ======
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playBeep({ frequency = 440, duration = 0.12, type = "sine", volume = 0.15 }) {
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      oscillator.type = type;
+      oscillator.frequency.value = frequency;
+      gainNode.gain.value = volume;
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      oscillator.start();
+      oscillator.stop(audioContext.currentTime + duration);
+    }
+
+    function playCoinSound() {
+      playBeep({ frequency: 760, duration: 0.12, type: "triangle", volume: 0.18 });
+    }
+
+    function playGameOverSound() {
+      playBeep({ frequency: 200, duration: 0.3, type: "sawtooth", volume: 0.2 });
+    }
+
+    // ====== Game State ======
+    const gameState = {
+      running: false,
+      gameOver: false,
+      score: 0,
+      lastTime: 0,
+    };
+
+    const keys = {
+      ArrowUp: false,
+      ArrowDown: false,
+      ArrowLeft: false,
+      ArrowRight: false,
+    };
+
+    // ====== Game Entities ======
+    const player = {
+      x: 100,
+      y: 260,
+      radius: 18,
+      speed: 220, // pixels per second
+      color: getComputedStyle(document.documentElement).getPropertyValue("--player"),
+    };
+
+    const coin = {
+      x: 450,
+      y: 260,
+      radius: 12,
+      color: getComputedStyle(document.documentElement).getPropertyValue("--coin"),
+    };
+
+    const enemies = [
+      { x: 780, y: 100, radius: 16, speed: 120, direction: 1 },
+      { x: 650, y: 400, radius: 20, speed: 160, direction: -1 },
+      { x: 500, y: 260, radius: 14, speed: 140, direction: 1 },
+    ];
+
+    // ====== Utility Functions ======
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function distance(a, b) {
+      const dx = a.x - b.x;
+      const dy = a.y - b.y;
+      return Math.hypot(dx, dy);
+    }
+
+    function randomPosition(radius) {
+      return {
+        x: radius + Math.random() * (canvas.width - radius * 2),
+        y: radius + Math.random() * (canvas.height - radius * 2),
+      };
+    }
+
+    function resetGame() {
+      gameState.score = 0;
+      gameState.gameOver = false;
+      gameState.lastTime = 0;
+      scoreEl.textContent = "0";
+      player.x = 100;
+      player.y = canvas.height / 2;
+
+      const coinPos = randomPosition(coin.radius);
+      coin.x = coinPos.x;
+      coin.y = coinPos.y;
+
+      enemies.forEach((enemy, index) => {
+        enemy.x = canvas.width - 150 - index * 100;
+        enemy.y = 100 + index * 140;
+        enemy.direction = index % 2 === 0 ? 1 : -1;
+      });
+
+      messageEl.textContent = "Use arrow keys to move. Collect coins, dodge enemies!";
+    }
+
+    // ====== Input Handling ======
+    window.addEventListener("keydown", (event) => {
+      if (keys.hasOwnProperty(event.key)) {
+        keys[event.key] = true;
+      }
+    });
+
+    window.addEventListener("keyup", (event) => {
+      if (keys.hasOwnProperty(event.key)) {
+        keys[event.key] = false;
+      }
+    });
+
+    // ====== Game Loop ======
+    function update(deltaTime) {
+      if (!gameState.running || gameState.gameOver) return;
+
+      // Move player based on pressed keys.
+      let velocityX = 0;
+      let velocityY = 0;
+      if (keys.ArrowUp) velocityY -= 1;
+      if (keys.ArrowDown) velocityY += 1;
+      if (keys.ArrowLeft) velocityX -= 1;
+      if (keys.ArrowRight) velocityX += 1;
+
+      // Normalize diagonal movement for consistent speed.
+      if (velocityX !== 0 && velocityY !== 0) {
+        const scale = Math.sqrt(0.5);
+        velocityX *= scale;
+        velocityY *= scale;
+      }
+
+      player.x += velocityX * player.speed * deltaTime;
+      player.y += velocityY * player.speed * deltaTime;
+
+      // Keep player inside the canvas.
+      player.x = clamp(player.x, player.radius, canvas.width - player.radius);
+      player.y = clamp(player.y, player.radius, canvas.height - player.radius);
+
+      // Move enemies vertically up and down.
+      enemies.forEach((enemy) => {
+        enemy.y += enemy.speed * enemy.direction * deltaTime;
+        if (enemy.y <= enemy.radius || enemy.y >= canvas.height - enemy.radius) {
+          enemy.direction *= -1;
         }
+      });
 
-        var width = canvas.width();
-        var height = canvas.height();        
-        canvas.attr("width", width);
-        canvas.attr("height", height);
+      // Check coin collection.
+      if (distance(player, coin) < player.radius + coin.radius) {
+        gameState.score += 10;
+        scoreEl.textContent = gameState.score.toString();
+        playCoinSound();
 
-        var opts = {
-            seed: {
-                x: width / 2 - 20,
-                color: "rgb(190, 26, 37)",
-                scale: 2
-            },
-            branch: [
-                [535, 680, 570, 250, 500, 200, 30, 100, [
-                    [540, 500, 455, 417, 340, 400, 13, 100, [
-                        [450, 435, 434, 430, 394, 395, 2, 40]
-                    ]],
-                    [550, 445, 600, 356, 680, 345, 12, 100, [
-                        [578, 400, 648, 409, 661, 426, 3, 80]
-                    ]],
-                    [539, 281, 537, 248, 534, 217, 3, 40],
-                    [546, 397, 413, 247, 328, 244, 9, 80, [
-                        [427, 286, 383, 253, 371, 205, 2, 40],
-                        [498, 345, 435, 315, 395, 330, 4, 60]
-                    ]],
-                    [546, 357, 608, 252, 678, 221, 6, 100, [
-                        [590, 293, 646, 277, 648, 271, 2, 80]
-                    ]]
-                ]] 
-            ],
-            bloom: {
-                num: 700,
-                width: 1080,
-                height: 650,
-            },
-            footer: {
-                width: 1200,
-                height: 5,
-                speed: 10,
-            }
+        const newPos = randomPosition(coin.radius);
+        coin.x = newPos.x;
+        coin.y = newPos.y;
+      }
+
+      // Check collisions with enemies.
+      enemies.forEach((enemy) => {
+        if (distance(player, enemy) < player.radius + enemy.radius) {
+          gameState.gameOver = true;
+          gameState.running = false;
+          playGameOverSound();
+          messageEl.textContent = "Game Over! Click Restart to try again.";
+          restartBtn.disabled = false;
+          startBtn.disabled = false;
         }
+      });
+    }
 
-        var tree = new Tree(canvas[0], width, height, opts);
-        var seed = tree.seed;
-        var foot = tree.footer;
-        var hold = 1;
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        canvas.click(function(e) {
-            playAudio();
-            var offset = canvas.offset(), x, y;
-            x = e.pageX - offset.left;
-            y = e.pageY - offset.top;
-            if (seed.hover(x, y)) {
-                hold = 0; 
-                canvas.unbind("click");
-                canvas.unbind("mousemove");
-                canvas.removeClass('hand');
-            }
-        }).mousemove(function(e) {
-            var offset = canvas.offset(), x, y;
-            x = e.pageX - offset.left;
-            y = e.pageY - offset.top;
-            canvas.toggleClass('hand', seed.hover(x, y));
-        });
+      // Draw coin
+      ctx.beginPath();
+      ctx.fillStyle = coin.color;
+      ctx.arc(coin.x, coin.y, coin.radius, 0, Math.PI * 2);
+      ctx.fill();
 
-        var seedAnimate = eval(Jscex.compile("async", function () {
-            seed.draw();
-            while (hold) {
-                $await(Jscex.Async.sleep(10));
-            }
-            while (seed.canScale()) {
-                seed.scale(0.95);
-                $await(Jscex.Async.sleep(10));
-            }
-            while (seed.canMove()) {
-                seed.move(0, 2);
-                foot.draw();
-                $await(Jscex.Async.sleep(10));
-            }
-        }));
+      // Draw enemies
+      enemies.forEach((enemy) => {
+        ctx.beginPath();
+        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--enemy");
+        ctx.arc(enemy.x, enemy.y, enemy.radius, 0, Math.PI * 2);
+        ctx.fill();
+      });
 
-        var growAnimate = eval(Jscex.compile("async", function () {
-            do {
-                tree.grow();
-                $await(Jscex.Async.sleep(10));
-            } while (tree.canGrow());
-        }));
+      // Draw player
+      ctx.beginPath();
+      ctx.fillStyle = player.color;
+      ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
-        var flowAnimate = eval(Jscex.compile("async", function () {
-            do {
-                tree.flower(2);
-                $await(Jscex.Async.sleep(10));
-            } while (tree.canFlower());
-        }));
+    function gameLoop(timestamp) {
+      if (!gameState.lastTime) {
+        gameState.lastTime = timestamp;
+      }
+      const deltaTime = (timestamp - gameState.lastTime) / 1000;
+      gameState.lastTime = timestamp;
 
-        var moveAnimate = eval(Jscex.compile("async", function () {
-            tree.snapshot("p1", 240, 0, 610, 680);
-            while (tree.move("p1", 500, 0)) {
-                foot.draw();
-                $await(Jscex.Async.sleep(10));
-            }
-            foot.draw();
-            tree.snapshot("p2", 500, 0, 610, 680);
+      update(deltaTime);
+      draw();
 
-            canvas.parent().css("background", "url(" + tree.toDataURL('image/png') + ")");
-            canvas.css("background", "#ffe");
-            $await(Jscex.Async.sleep(300));
-            canvas.css("background", "none");
-        }));
+      if (gameState.running) {
+        requestAnimationFrame(gameLoop);
+      }
+    }
 
-        var textAnimate = eval(Jscex.compile("async", function () {
-            $("#code").show().typewriter();
-        }));
-	    
-        var runAsync = eval(Jscex.compile("async", function () {
-            $await(seedAnimate());
-            $await(growAnimate());
-            $await(flowAnimate());
-            $await(moveAnimate());
-            textAnimate().start();
-        }));
+    // ====== Button Events ======
+    startBtn.addEventListener("click", () => {
+      if (audioContext.state === "suspended") {
+        audioContext.resume();
+      }
+      resetGame();
+      gameState.running = true;
+      startBtn.disabled = true;
+      restartBtn.disabled = false;
+      requestAnimationFrame(gameLoop);
+    });
 
-        runAsync().start();
-    })();
-    </script>
+    restartBtn.addEventListener("click", () => {
+      if (audioContext.state === "suspended") {
+        audioContext.resume();
+      }
+      resetGame();
+      gameState.running = true;
+      gameState.gameOver = false;
+      startBtn.disabled = true;
+      restartBtn.disabled = false;
+      requestAnimationFrame(gameLoop);
+    });
+
+    // Initial draw for clean UI.
+    draw();
+  </script>
 </body>
 </html>

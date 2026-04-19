@@ -1,0 +1,228 @@
+:root {
+  color-scheme: dark;
+  --bg: #090c12;
+  --panel: #121823;
+  --panel-alt: #1a2231;
+  --text: #ebf0ff;
+  --muted: #a7b1c5;
+  --accent: #6d8dff;
+  --accent-2: #8f6dff;
+  --user: #3155d4;
+  --ai: #202c40;
+  --danger: #ff6d8a;
+  --border: #2a3550;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Inter, Segoe UI, Roboto, sans-serif;
+  background: radial-gradient(circle at top, #172031 0%, var(--bg) 45%);
+  color: var(--text);
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.app-shell {
+  width: min(900px, 100%);
+  height: min(92vh, 900px);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0));
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  overflow: hidden;
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px);
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.2rem;
+  border-bottom: 1px solid var(--border);
+  background: rgba(6, 11, 18, 0.65);
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.topbar p {
+  margin: 0.2rem 0 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.chat-window {
+  padding: 1.1rem;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.message-row {
+  display: flex;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: slideIn 180ms ease forwards;
+}
+
+.message-row.user {
+  justify-content: flex-end;
+}
+
+.bubble {
+  max-width: min(80%, 680px);
+  padding: 0.75rem 0.9rem;
+  border-radius: 14px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  border: 1px solid transparent;
+}
+
+.message-row.user .bubble {
+  background: linear-gradient(150deg, var(--user), #2a6bf3);
+  border-bottom-right-radius: 4px;
+}
+
+.message-row.assistant .bubble,
+.message-row.system .bubble {
+  background: var(--ai);
+  border-color: #2a3a57;
+  border-bottom-left-radius: 4px;
+}
+
+.message-row.system .bubble {
+  color: var(--muted);
+}
+
+.typing {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.typing span {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #91a1c8;
+  animation: blink 1s infinite ease-in-out;
+}
+
+.typing span:nth-child(2) {
+  animation-delay: 150ms;
+}
+
+.typing span:nth-child(3) {
+  animation-delay: 300ms;
+}
+
+.chat-form {
+  border-top: 1px solid var(--border);
+  padding: 0.85rem;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.7rem;
+  background: rgba(6, 11, 18, 0.75);
+}
+
+textarea {
+  resize: none;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.75rem 0.85rem;
+  background: var(--panel-alt);
+  color: var(--text);
+  font: inherit;
+  max-height: 180px;
+}
+
+button {
+  border: 0;
+  border-radius: 12px;
+  background: linear-gradient(140deg, var(--accent), var(--accent-2));
+  color: white;
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: transform 0.16s ease, opacity 0.16s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.ghost-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+
+.ghost-btn:hover {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+@keyframes slideIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes blink {
+  0%,
+  80%,
+  100% {
+    transform: scale(0.85);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  body {
+    padding: 0;
+  }
+
+  .app-shell {
+    width: 100%;
+    height: 100vh;
+    border-radius: 0;
+    border: 0;
+  }
+
+  .bubble {
+    max-width: 92%;
+  }
+}
